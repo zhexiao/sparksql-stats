@@ -8,11 +8,33 @@
 2. Python版本为2.7
 3. Mysql版本为5.6
 
-## 安装pyspark库
+## 更换ubuntu 16的源
 ```bash
-$ cd spark-2.3.0-bin-hadoop2.7/python
-$ python setup.py sdist
-$ pip install dist/*.tar.gz
+$ sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+$ sudo vim /etc/apt/sources.list
+""
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial universe
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates universe
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security universe
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security multiverse
+""
+
+$ sudo apt-get update 
+$ sudo apt-get update --fix-missing
+```
+
+## 安装依赖
+```bash
+$ sudo apt-get install -y tar wget git
+$ sudo apt-get install -y openjdk-8-jdk
+
+$ sudo apt-get -y install build-essential python-dev python-pip python-six python-virtualenv libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev zlib1g-dev
 ```
 
 ## 安装 Mysql Connector
@@ -30,6 +52,46 @@ $ vim conf/spark-defaults.conf
 ""
 spark.jars  /opt/spark/jars/mysql-connector-java-8.0.11.jar
 ""
+```
+
+### 配置SPARK
+下面的配置数据是SPARK单机模式的简单配置范例
+```bash
+$ cp conf/spark-env.sh.template conf/spark-env.sh
+$ vim conf/spark-env.sh
+""
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+
+export SPARK_HOME=/opt/spark
+export SPARK_LOCAL_IP=127.0.0.1
+""
+```
+
+### 测试Connector安装完毕
+进入pyspark模式
+```bash
+$ ./bin/pyspark
+```
+
+测试
+```python
+from pyspark.sql import SQLContext
+
+sqlContext = SQLContext(sc)
+mysql_table = sqlContext.read.format("jdbc").options(
+    url="jdbc:mysql://192.168.33.11:3306/ccnu_resource", 
+    dbtable="paper", 
+    user="zhexiao", 
+    password="password").load()
+mysql_table.printSchema()
+```
+
+## 安装pyspark库
+```bash
+$ cd spark-2.3.0-bin-hadoop2.7/python
+$ python setup.py sdist
+$ pip install dist/*.tar.gz
 ```
 
 ## 项目配置
