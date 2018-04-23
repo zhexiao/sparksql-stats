@@ -1,8 +1,8 @@
 # coding: utf-8
 import time
-from ccnu_resource.paper.spark_paper import SparkPaper
-from ccnu_resource.question.spark_question import SparkQuestion
-from ccnu_resource.cognition.spark_cognition import SparkCognition
+from paper.spark_paper import SparkPaper
+from question.spark_question import SparkQuestion
+from cognition.spark_cognition import SparkCognition
 
 start_time = time.time()
 

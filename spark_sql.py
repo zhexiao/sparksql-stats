@@ -1,6 +1,6 @@
 # coding: utf-8
 from pyspark.sql import SparkSession
-from ccnu_resource.settings import MYSQL_CONF, SPARK_CONF
+from settings import MYSQL_CONF, SPARK_CONF
 
 
 class SparkBase(object):

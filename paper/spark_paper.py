@@ -1,7 +1,7 @@
 # coding: utf-8
 from pyspark.sql.functions import broadcast
-from ccnu_resource.spark_resource import SparkResource
-from ccnu_resource.exceptions import ResourceError
+from spark_resource import SparkResource
+from spark_exceptions import ResourceError
 
 
 class SparkPaper(SparkResource):

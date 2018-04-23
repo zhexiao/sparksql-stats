@@ -1,5 +1,5 @@
 # coding: utf-8
-from ccnu_resource.spark_sql import SparkSql
+from spark_sql import SparkSql
 
 
 class SparkResource(object):
