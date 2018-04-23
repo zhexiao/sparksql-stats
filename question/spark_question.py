@@ -5,6 +5,13 @@ from spark_exceptions import ResourceError
 
 
 class SparkQuestion(SparkResource):
+    """
+    DEMO:
+    s_question = SparkQuestion()
+    diff_df = s_question.get_question_diff_distri(faculty=3, subject=1)
+    print(diff_df.toJSON().collect())
+    """
+
     def __init__(self):
         super(SparkQuestion, self).__init__()
 

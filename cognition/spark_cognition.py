@@ -5,6 +5,12 @@ from spark_exceptions import ResourceError
 
 
 class SparkCognition(SparkResource):
+    """
+    DEMO:
+    s_cognition = SparkCognition()
+    knowledge_df = s_cognition.get_knowledge_top_n(faculty=3, subject=1)
+    print(knowledge_df.toJSON().collect())
+    """
     def __init__(self):
         super(SparkCognition, self).__init__()
 

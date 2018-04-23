@@ -5,6 +5,13 @@ from spark_exceptions import ResourceError
 
 
 class SparkPaper(SparkResource):
+    """
+    DEMO:
+    s_paper = SparkPaper()
+    paper_id = "0009f836-bd30-11e7-97d7-005056b23776"
+    paper_info = s_paper.get_paper_info(paper_id=paper_id)
+    print(paper_info.toJSON().collect())
+    """
     def __init__(self):
         super(SparkPaper, self).__init__()
 
