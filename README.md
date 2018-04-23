@@ -1,0 +1,2 @@
+# sparksql-stats
+基于PySpark库，使用SparkSql连接MYSQL数据库并对数据进行统计分析的基础架构
