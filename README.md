@@ -44,7 +44,7 @@ $ sudo apt-get -y install build-essential python-dev python-pip python-six pytho
 ```bash
 $ cp mysql-connector-java-8.0.11/mysql-connector-java-8.0.11.jar /opt/spark/jars/
 ```
-### 配置Spark Jars
+### 配置 Spark Jars
 ```bash
 $ cd /opt/spark
 $ cp conf/spark-defaults.conf.template conf/spark-defaults.conf
@@ -54,7 +54,7 @@ spark.jars  /opt/spark/jars/mysql-connector-java-8.0.11.jar
 ""
 ```
 
-### 配置SPARK
+### 配置 Spark
 下面的配置数据是SPARK单机模式的简单配置范例
 ```bash
 $ cp conf/spark-env.sh.template conf/spark-env.sh
