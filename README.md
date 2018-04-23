@@ -9,7 +9,7 @@
 3. Mysql版本为5.6
 
 ## 安装 Mysql Connector
-1. 打开Mysql JDBC驱动的地址https://dev.mysql.com/downloads/connector/j/，选择Platform Independent系统，找到对应的版本下载mysql connector。
+1. 打开Mysql JDBC驱动的地址https://dev.mysql.com/downloads/connector/j/, 选择Platform Independent系统，找到对应的版本下载mysql connector。
 2. 解压缩数据包后可以找到文件 mysql-connector-java-8.0.11.jar
 3. 复制文件到spark/jars文件夹下面
 ```bash
