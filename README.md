@@ -88,16 +88,10 @@ mysql_table.printSchema()
 ```
 
 ## 安装pyspark库
-创建虚拟环境
-```bash
-$ virtualenv env
-$ source env/bin/activate
-```
-
 ```bash
 $ cd spark-2.3.0-bin-hadoop2.7/python
 $ python setup.py sdist
-$ pip install dist/*.tar.gz 或者  sudo -H pip install dist/*.tar.gz
+$ pip install dist/*.tar.gz
 ```
 
 ## 项目配置
