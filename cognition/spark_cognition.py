@@ -59,7 +59,6 @@ class SparkCognition(SparkResource):
         """
         if not faculty or not subject:
             raise ResourceError('缺少faculty或者subject')
-        filter_str = "faculty = {0} and subject = {1}".format(faculty, subject)
 
         sql_string = """
         SELECT `cognition_map_num`, COUNT(`cognition_map_num`) as `count`

@@ -65,5 +65,5 @@ def run_sql_v():
 
 if __name__ == '__main__':
     run_sql_v()
-    # run_broadcast()
+    run_broadcast()
 

@@ -25,12 +25,14 @@ class SparkQuestion(SparkResource):
         if not faculty or not subject:
             raise ResourceError('缺少faculty或者subject')
 
-        res_df = self.spark_sql.spark.sql(
-            "SELECT COUNT(`diff`) as `count`, `diff` FROM tmp_question "
-            "WHERE `faculty`={0} AND `subject`={1} "
-            "GROUP BY `diff`".format(faculty, subject)
-        )
+        sql_string = """
+        SELECT COUNT(`diff`) as `count`, `diff` 
+        FROM tmp_question
+        WHERE `faculty`={0} AND `subject`={1}
+        GROUP BY `diff`
+        """.format(faculty, subject)
 
+        res_df = self.spark_sql.spark.sql(sql_string)
         return res_df
 
     def get_question_diff_distri(self, faculty=None, subject=None):
@@ -100,17 +102,18 @@ class SparkQuestion(SparkResource):
         if not faculty or not subject:
             raise ResourceError('缺少faculty或者subject')
 
-        res_df = self.spark_sql.spark.sql(
-            "SELECT `question_id`, COUNT(`question_id`) as `count` "
-            "FROM tmp_paper_subtype_question tpsq "
-            "LEFT JOIN tmp_question tq "
-            "ON tpsq.question_id = tq.qid "
-            "WHERE `faculty`={0} "
-            "and `subject`={1} "
-            "and `structure_string` IS NOT NULL "
-            "GROUP BY `question_id` "
-            "ORDER BY `count` DESC "
-            "LIMIT {2}".format(faculty, subject, n)
-        )
+        sql_string = """
+        SELECT `question_id`, COUNT(`question_id`) as `count` 
+        FROM tmp_paper_subtype_question tpsq
+        LEFT JOIN tmp_question tq
+        ON tpsq.question_id = tq.qid
+        WHERE `faculty`={0}
+        and `subject`={1}
+        and `structure_string` IS NOT NULL
+        GROUP BY `question_id`
+        ORDER BY `count` DESC
+        LIMIT {2}
+        """.format(faculty, subject, n)
 
+        res_df = self.spark_sql.spark.sql(sql_string)
         return res_df
