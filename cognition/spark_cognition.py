@@ -15,43 +15,9 @@ class SparkCognition(SparkResource):
     def __init__(self):
         super(SparkCognition, self).__init__()
 
-    def get_knowledge_freq_top_n(self, n=20, faculty=None, subject=None):
-        """
-        得到某学科和学段下面试卷的知识点使用频繁度
-        :param n:
-        :param faculty:
-        :param subject:
-        :return:
-        """
-        if not faculty or not subject:
-            raise ResourceError('缺少faculty或者subject')
-        filter_str = "faculty = {0} and subject = {1}".format(faculty, subject)
-
-        # 读取表的dataframe
-        sub_q_df = self.spark_sql.load_table_df('paper_subtype_question')
-        question_df = self.spark_sql.load_table_df('question')
-        q_map_df = self.spark_sql.load_table_df('question_cognition_map')
-
-        df = broadcast(sub_q_df).join(
-            question_df, on=[
-                question_df.qid == sub_q_df.question_id
-            ], how='left'
-        ).join(
-            q_map_df, on=[
-                q_map_df.question_id == sub_q_df.question_id
-            ], how='left'
-        ).select(q_map_df.cognition_map_num)
-
-        # 统计排序
-        res_df = df.filter(filter_str).groupBy(
-            "cognition_map_num"
-        ).count().sort('count', ascending=False).limit(n)
-
-        return res_df
-
     def get_knowledge_freq_top_n_sqlv(self, n=20, faculty=None, subject=None):
         """
-        得到某学科和学段下面试卷的知识点使用频繁度
+        得到某学科和学段下面试卷的知识点使用频繁度 SQL版本
         :param n:
         :param faculty:
         :param subject:
@@ -67,6 +33,31 @@ class SparkCognition(SparkResource):
         ON tpsq.question_id = tq.qid
         LEFT JOIN tmp_question_cognition_map tqcm
         ON tpsq.question_id = tqcm.question_id
+        WHERE `faculty` = {0} AND `subject` = {1}
+        GROUP BY `cognition_map_num`
+        ORDER BY `count` DESC
+        LIMIT {2}
+        """.format(faculty, subject, n)
+
+        res_df = self.spark_sql.spark.sql(sql_string)
+        return res_df
+
+    def get_knowledge_top_n_sqlv(self, n=20, faculty=None, subject=None):
+        """
+        获得某学科和学段下面的试题获得所绑定知识点的TOP数 SQL版本
+        :param n:
+        :param faculty:
+        :param subject:
+        :return:
+        """
+        if not faculty or not subject:
+            raise ResourceError('缺少faculty或者subject')
+
+        sql_string = """
+        SELECT `cognition_map_num`, COUNT(`cognition_map_num`) as `count`
+        FROM tmp_question_cognition_map tqcm
+        LEFT JOIN tmp_question tq
+        ON tqcm.question_id = tq.qid
         WHERE `faculty` = {0} AND `subject` = {1}
         GROUP BY `cognition_map_num`
         ORDER BY `count` DESC
@@ -108,9 +99,9 @@ class SparkCognition(SparkResource):
 
         return res_df
 
-    def get_knowledge_top_n_sqlv(self, n=20, faculty=None, subject=None):
+    def get_knowledge_freq_top_n(self, n=20, faculty=None, subject=None):
         """
-        获得某学科和学段下面的试题获得所绑定知识点的TOP数
+        得到某学科和学段下面试卷的知识点使用频繁度
         :param n:
         :param faculty:
         :param subject:
@@ -118,17 +109,26 @@ class SparkCognition(SparkResource):
         """
         if not faculty or not subject:
             raise ResourceError('缺少faculty或者subject')
+        filter_str = "faculty = {0} and subject = {1}".format(faculty, subject)
 
-        sql_string = """
-        SELECT `cognition_map_num`, COUNT(`cognition_map_num`) as `count`
-        FROM tmp_question_cognition_map tqcm
-        LEFT JOIN tmp_question tq
-        ON tqcm.question_id = tq.qid
-        WHERE `faculty` = {0} AND `subject` = {1}
-        GROUP BY `cognition_map_num`
-        ORDER BY `count` DESC
-        LIMIT {2}
-        """.format(faculty, subject, n)
+        # 读取表的dataframe
+        sub_q_df = self.spark_sql.load_table_df('paper_subtype_question')
+        question_df = self.spark_sql.load_table_df('question')
+        q_map_df = self.spark_sql.load_table_df('question_cognition_map')
 
-        res_df = self.spark_sql.spark.sql(sql_string)
+        df = broadcast(sub_q_df).join(
+            question_df, on=[
+                question_df.qid == sub_q_df.question_id
+            ], how='left'
+        ).join(
+            q_map_df, on=[
+                q_map_df.question_id == sub_q_df.question_id
+            ], how='left'
+        ).select(q_map_df.cognition_map_num)
+
+        # 统计排序
+        res_df = df.filter(filter_str).groupBy(
+            "cognition_map_num"
+        ).count().sort('count', ascending=False).limit(n)
+
         return res_df

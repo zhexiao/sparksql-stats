@@ -17,7 +17,7 @@ class SparkQuestion(SparkResource):
 
     def get_question_diff_distri_sqlv(self, faculty=None, subject=None):
         """
-        得到某学科和学段下面试题的困难度分布
+        得到某学科和学段下面试题的困难度分布 SQL版本
         :param faculty:
         :param subject:
         :return:
@@ -31,6 +31,33 @@ class SparkQuestion(SparkResource):
         WHERE `faculty`={0} AND `subject`={1}
         GROUP BY `diff`
         """.format(faculty, subject)
+
+        res_df = self.spark_sql.spark.sql(sql_string)
+        return res_df
+
+    def get_question_freq_top_n_sqlv(self, n=20, faculty=None, subject=None):
+        """
+        得到某学科和学段下面试卷的试题使用频繁度 SQL版本
+        :param n:
+        :param faculty:
+        :param subject:
+        :return:
+        """
+        if not faculty or not subject:
+            raise ResourceError('缺少faculty或者subject')
+
+        sql_string = """
+        SELECT `question_id`, COUNT(`question_id`) as `count` 
+        FROM tmp_paper_subtype_question tpsq
+        LEFT JOIN tmp_question tq
+        ON tpsq.question_id = tq.qid
+        WHERE `faculty`={0}
+        and `subject`={1}
+        and `structure_string` IS NOT NULL
+        GROUP BY `question_id`
+        ORDER BY `count` DESC
+        LIMIT {2}
+        """.format(faculty, subject, n)
 
         res_df = self.spark_sql.spark.sql(sql_string)
         return res_df
@@ -89,31 +116,4 @@ class SparkQuestion(SparkResource):
             "question_id"
         ).count().sort('count', ascending=False).limit(n)
 
-        return res_df
-
-    def get_question_freq_top_n_sqlv(self, n=20, faculty=None, subject=None):
-        """
-        得到某学科和学段下面试卷的试题使用频繁度
-        :param n:
-        :param faculty:
-        :param subject:
-        :return:
-        """
-        if not faculty or not subject:
-            raise ResourceError('缺少faculty或者subject')
-
-        sql_string = """
-        SELECT `question_id`, COUNT(`question_id`) as `count` 
-        FROM tmp_paper_subtype_question tpsq
-        LEFT JOIN tmp_question tq
-        ON tpsq.question_id = tq.qid
-        WHERE `faculty`={0}
-        and `subject`={1}
-        and `structure_string` IS NOT NULL
-        GROUP BY `question_id`
-        ORDER BY `count` DESC
-        LIMIT {2}
-        """.format(faculty, subject, n)
-
-        res_df = self.spark_sql.spark.sql(sql_string)
         return res_df
