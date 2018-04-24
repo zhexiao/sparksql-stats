@@ -102,3 +102,4 @@ ENV/
 
 settings.py
 .idea/*
+spark-warehouse/*

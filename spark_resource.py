@@ -6,6 +6,14 @@ class SparkResource(object):
     def __init__(self):
         self.spark_sql = SparkSql()
 
+        self.question_df = self.spark_sql.load_table_df('question')
+        self.paper_sub_q_df = self.spark_sql.load_table_df(
+            'paper_subtype_question'
+        )
+        self.question_cog_map_df = self.spark_sql.load_table_df(
+            'question_cognition_map'
+        )
+
     def init_temp_view(self):
         """
         SQL版本先加载表用的，但是SQL版本速度一般，先不调用

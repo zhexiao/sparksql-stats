@@ -82,15 +82,11 @@ class SparkCognition(SparkResource):
             faculty, subject
         )
 
-        # 读取表的dataframe
-        cog_map_df = self.spark_sql.load_table_df('question_cognition_map')
-        question_df = self.spark_sql.load_table_df('question')
-
-        df = broadcast(cog_map_df).join(
-            question_df, on=[
-                cog_map_df.question_id == question_df.qid
+        df = broadcast(self.question_cog_map_df).join(
+            self.question_df, on=[
+                self.question_cog_map_df.question_id == self.question_df.qid
             ], how='left'
-        ).select(cog_map_df.cognition_map_num)
+        ).select(self.question_cog_map_df.cognition_map_num)
 
         # 统计排序
         res_df = df.filter(filter_str).groupBy(
@@ -111,20 +107,15 @@ class SparkCognition(SparkResource):
             raise ResourceError('缺少faculty或者subject')
         filter_str = "faculty = {0} and subject = {1}".format(faculty, subject)
 
-        # 读取表的dataframe
-        sub_q_df = self.spark_sql.load_table_df('paper_subtype_question')
-        question_df = self.spark_sql.load_table_df('question')
-        q_map_df = self.spark_sql.load_table_df('question_cognition_map')
-
-        df = broadcast(sub_q_df).join(
-            question_df, on=[
-                question_df.qid == sub_q_df.question_id
+        df = broadcast(self.paper_sub_q_df).join(
+            self.question_df, on=[
+                self.question_df.qid == self.paper_sub_q_df.question_id
             ], how='left'
         ).join(
-            q_map_df, on=[
-                q_map_df.question_id == sub_q_df.question_id
+            self.question_cog_map_df, on=[
+                self.question_cog_map_df.question_id == self.paper_sub_q_df.question_id
             ], how='left'
-        ).select(q_map_df.cognition_map_num)
+        ).select(self.question_cog_map_df.cognition_map_num)
 
         # 统计排序
         res_df = df.filter(filter_str).groupBy(

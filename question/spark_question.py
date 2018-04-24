@@ -76,11 +76,8 @@ class SparkQuestion(SparkResource):
             faculty, subject
         )
 
-        # 读取表的dataframe
-        question_df = self.spark_sql.load_table_df('question')
-
         # 统计排序
-        res_df = question_df.filter(filter_str).groupBy(
+        res_df = self.question_df.filter(filter_str).groupBy(
             "diff"
         ).count()
 
@@ -101,15 +98,11 @@ class SparkQuestion(SparkResource):
             "structure_string IS NOT NULL".format(faculty, subject)
         )
 
-        # 读取表的dataframe
-        sub_q_df = self.spark_sql.load_table_df('paper_subtype_question')
-        question_df = self.spark_sql.load_table_df('question')
-
-        df = broadcast(sub_q_df).join(
-            question_df, on=[
-                sub_q_df.question_id == question_df.qid
+        df = broadcast(self.paper_sub_q_df).join(
+            self.question_df, on=[
+                self.paper_sub_q_df.question_id == self.question_df.qid
             ], how='left'
-        ).select(sub_q_df.question_id)
+        ).select(self.paper_sub_q_df.question_id)
 
         # 统计排序
         res_df = df.filter(filter_str).groupBy(
